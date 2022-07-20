@@ -9,6 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import PostFilter
 from .models import Post, User
+from .permissions import IsAuthorOrAuthenticatedOnly
 from .serializers import PostSerializer, UserSerializer
 
 
@@ -35,6 +36,7 @@ def register(request):
 class PostViewSet(ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = (IsAuthorOrAuthenticatedOnly,)
     filter_backends = (DjangoFilterBackend,)
     filterset_class = PostFilter
 
