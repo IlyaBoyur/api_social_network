@@ -1,0 +1,39 @@
+version: '3.3'
+
+volumes:
+  api_social_network_postgres_data:  
+  api_social_network_static:
+  api_social_network_media:
+
+services:
+
+  nginx:
+    image: nginx:1.19.3
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ../docs/redoc.html:/usr/share/nginx/html/api/docs/redoc.html
+      - ../docs/openapi-schema.yml:/usr/share/nginx/html/api/docs/openapi-schema.yml
+      - api_social_network_static:/var/html/backend_static/
+      - api_social_network_media:/var/html/backend_media/
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:12.4
+    volumes:
+      - api_social_network_postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+
+  backend:
+    build: ../backend/social_network/
+    restart: always
+    volumes:
+      - api_social_network_static:/code/backend_static/
+      - api_social_network_media:/code/backend_media/
+    depends_on:
+      - db
+    env_file:
+      - ./.env
