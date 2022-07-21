@@ -30,8 +30,9 @@ def user(request):
 def register(request):
     serializer = UserWriteSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
+    password = request.data.get('password')
     user = serializer.save()
-    refresh = RefreshToken.for_user(user)
+    user.set_password(password)
     user.is_active = True
     user.save()
     refresh = RefreshToken.for_user(user)
