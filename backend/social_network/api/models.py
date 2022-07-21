@@ -41,7 +41,6 @@ class User(AbstractUser):
         'Пол',
         max_length=1,
         choices=GENDER_CHOICES,
-        blank=True,
         null=True,
     )
     age = models.PositiveSmallIntegerField(
@@ -49,7 +48,6 @@ class User(AbstractUser):
         validators=(
             validators.MinValueValidator(7, ERROR_INVALID_AGE.format(age=7)),
         ),
-        blank=True,
         null=True,
     )
     register_date = models.DateTimeField(
