@@ -128,6 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Static and Media
-static/
-media/
+# Static and Media files
+backend_static/
+backend_media/
