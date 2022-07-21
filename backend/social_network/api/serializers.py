@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
 
 from .fields import Base64ImageField, PhoneNumberField
 from .models import Post, PostImage
@@ -65,10 +66,23 @@ class PostSerializer(serializers.ModelSerializer):
             )
 
 
-class UserSerializer(serializers.ModelSerializer):
-    phone = PhoneNumberField()
+class UserWriteSerializer(serializers.ModelSerializer):
+    phone = PhoneNumberField(
+        validators=(UniqueValidator(queryset=User.objects.all()),),
+    )
 
     class Meta:
         model = User
-        fields = ('phone', 'username', 'email', 'about',
+        fields = ('phone', 'username', 'email', 'password', 'about',
+                  'gender', 'age',)
+
+
+class UserReadSerializer(serializers.ModelSerializer):
+    phone = PhoneNumberField(
+        validators=(UniqueValidator(queryset=User.objects.all()),),
+    )
+
+    class Meta:
+        model = User
+        fields = ('id', 'phone', 'username', 'email', 'about',
                   'gender', 'age', 'register_date',)

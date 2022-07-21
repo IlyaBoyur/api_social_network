@@ -10,8 +10,10 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .filters import PostFilter
-from .models import Post, User
+from .models import Post
 from .permissions import IsAuthorOrAuthenticatedOnly
+from .serializers import (PostSerializer, UserReadSerializer,
+                          UserWriteSerializer)
 
 User = get_user_model()
 
@@ -20,20 +22,21 @@ User = get_user_model()
 @permission_classes([IsAuthenticated])
 def user(request):
     user = get_object_or_404(User, username=request.user.username)
-    return Response(UserSerializer(user).data)
+    return Response(UserReadSerializer(user).data)
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
-    serializer = UserSerializer(data=request.data)
+    serializer = UserWriteSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
     refresh = RefreshToken.for_user(user)
     user.is_active = True
     user.save()
-    return Response({'token': str(refresh.access_token)},
-                    status=status.HTTP_200_OK)
+    refresh = RefreshToken.for_user(user)
+    return Response({'access': str(refresh.access_token)},
+                    status=status.HTTP_201_CREATED)
 
 
 class PostViewSet(ModelViewSet):
