@@ -1,0 +1,407 @@
+openapi: 3.0.2
+info:
+  title: Social Network API
+  version: '1.0.0'
+
+paths:
+  /api/register/:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      description: 'Зарегистрировать нового пользователя'
+      parameters: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokensAccess'
+          description: CREATED
+      tags: 
+        - 'Пользователи'
+  /api/login/:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      description: 'Авторизовать текущего пользователя (получить токен)'
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokens'
+          description: OK
+      tags: 
+        - 'Пользователи'
+  /api/login/refresh/:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserTokensRefresh'
+      description: 'Обновить токен'
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokensAccess'
+          description: OK
+      tags: 
+        - 'Пользователи'
+  /api/user/:
+    post:
+      description: 'Получить информацию о текущем пользователе'
+      security:
+        - BearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSelf'
+          description: OK
+      tags: 
+        - 'Пользователи'
+  /api/posts/:
+    get:
+      description: 'Получить посты'
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: author
+          required: false
+          in: query
+          description: Имя пользователя (автора поста)
+          schema:
+            type: string
+        - name: publicated
+          required: false
+          in: query
+          description: Дата создания поста
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostList'
+          description: OK
+      tags: 
+        - 'Посты'
+  
+    post:
+      description: 'Создать пост'
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+      responses:
+        '201':
+          description: CREATED
+      tags: 
+        - 'Посты'
+
+  /api/posts/{id}/:
+    get:
+      description: 'Получить пост по id'
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Уникальный идентификатор поста
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: OK
+      tags: 
+        - 'Посты'
+
+    put:
+      description: 'Заменить пост с определенным id'
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Уникальный идентификатор поста
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: OK
+      tags: 
+        - 'Посты'
+    
+    patch:
+      description: 'Обновить пост с определенным id (частично)'
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCreate'
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Уникальный идентификатор поста
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: OK
+      tags: 
+        - 'Посты'
+    
+    delete:
+      description: 'Удалить пост с определенным id'
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          required: true
+          in: path
+          description: Уникальный идентификатор поста
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: NO CONTENT
+      tags: 
+        - 'Посты'
+
+components:
+  schemas:
+
+    UserLogin:
+      description: 'Авторизация'
+      type: object
+      properties:
+        username:
+          type: string
+          format: string
+          description: "Уникальное имя пользователя"
+        password:
+          type: string
+          format: password
+          description: "Пароль пользователя"
+
+    UserTokensAccess:
+      description: 'Регистрация'
+      type: object
+      properties:
+        access:
+          type: string
+          format: string
+          description: "Уникальный токен пользователя"
+
+    UserTokens:
+      description: 'JWT: Получить токены'
+      type: object
+      properties:
+        refresh:
+          type: string
+          format: string
+          description: "Токен refresh"
+        access:
+          type: string
+          format: string
+          description: "Токен access"
+    
+    UserTokensRefresh:
+      description: 'JWT: Обновить токен'
+      type: object
+      properties:
+        refresh:
+          type: string
+          format: string
+          description: "Токен refresh"
+
+    UserCreate:
+      description: 'Регистрация нового пользователя'
+      type: object
+      properties:
+        username:
+          type: string
+          format: string
+          description: "Уникальное имя пользователя"
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: "Адрес электронной почты"
+        phone:
+          type: string
+          format: phone
+          maxLength: 12
+          description: "Телефонный номер"    
+          example: "+79991112255"
+        about:
+          type: string
+          maxLength: 500
+          description: "Информация о пользователе"
+        gender:
+          type: string
+          maxLength: 1
+          description: "Пол: W (Женский) или M (Мужской)"
+          example: "W"
+        age:
+          type: integer
+          description: "Количество полных лет"
+      required:
+        - username
+        - email
+
+    UserSelf:
+      description: 'Пользователь'
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        phone:
+          type: string
+          format: phone
+          maxLength: 16
+          description: "Телефонный номер"       
+          example: "+7(111)222-33-44"
+        username:
+          type: string
+          format: string
+          description: "Уникальный юзернейм"
+          maxLength: 150
+          example: "username"
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: "Адрес электронной почты"
+        about:
+          type: string
+          maxLength: 500
+          description: "Информация о пользователе"
+        gender:
+          type: string
+          maxLength: 1
+          description: "Пол: W (Женский) или M (Мужской)"
+          example: "M"
+        age:
+          type: integer
+          description: "Количество полных лет"
+        register_date:
+          type: string
+          description: "Дата регистрации"
+          example: "1000-01-31T00:00:00.000000Z"
+      required: 
+      - username
+
+    PostList:
+      description: 'Список постов'
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+          description: 'Общее количество постов в базе'
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://127.0.0.1:8000/api/posts/?page=4
+          description: 'Ссылка на следующую страницу'
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://foodgram.example.org/api/users/?page=2
+          description: 'Ссылка на предыдущую страницу'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+          
+    Post:
+      description: 'Пост'
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        author:
+          type: string
+          description: "Юзернейм автора поста"
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostImage'
+        text:
+          type: string
+          description: "Текст поста"
+        pub_date:
+          type: string
+          description: "Дата публикации"
+          example: "1000-01-31T00:00:00.000000Z"
+
+    PostCreate:
+      description: "Пост: создание"
+      type: object
+      properties:
+        text:
+          type: string
+          description: "Текст поста"
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostImage'
+
+    PostImage:
+      description: 'Изображение поста'
+      type: object
+      properties:
+        image:
+          type: string
+          format: uri
+          example: http://127.0.0.1:8000/media/posts/image.gif
+          description: 'Ссылка на изображение'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
