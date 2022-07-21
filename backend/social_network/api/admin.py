@@ -21,10 +21,11 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'text', 'author', 'pub_date',)
+    list_display = ('pk', 'author', 'text', 'pub_date',)
     search_fields = ('text',)
     list_filter = ('pub_date',)
     empty_value_display = '-пусто-'
+    inlines = (ImagesInlineAdmin,)
 
 
 @admin.register(PostImage)
