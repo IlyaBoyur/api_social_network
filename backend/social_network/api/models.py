@@ -13,7 +13,7 @@ ERROR_INVALID_USERNAME = 'Введите допустимое имя'
 
 
 class User(AbstractUser):
-    phone = models.PositiveIntegerField(
+    phone = models.PositiveBigIntegerField(
         'Номер телефона',
         unique=True,
         blank=True,
