@@ -8,31 +8,49 @@ GENDER_CHOICES = (
     (MEN, 'Мужской'),
     (WOMEN, 'Женский'),
 )
+ERROR_INVALID_AGE = 'Минимальный возраст: {age}'
+ERROR_INVALID_USERNAME = 'Введите допустимое имя'
 
 
 class User(AbstractUser):
     phone = models.PositiveIntegerField(
         'Номер телефона',
         unique=True,
+        blank=True,
+        null=True,
     )
     email = models.EmailField(
         'Электронная почта',
         unique=True,
     )
+    username = models.CharField(
+        'Уникальный юзернейм',
+        max_length=150,
+        validators=(
+            validators.RegexValidator(r'^[\w.@+-]+\Z',
+                                      message=ERROR_INVALID_USERNAME),
+        ),
+        unique=True,
+    )
     about = models.TextField(
         'О себе',
         max_length=500,
+        blank=True,
     )
     gender = models.CharField(
         'Пол',
         max_length=1,
         choices=GENDER_CHOICES,
+        blank=True,
+        null=True,
     )
     age = models.PositiveSmallIntegerField(
         'Возраст',
         validators=(
-            validators.MinValueValidator(7, 'Минимальный возраст: 7'),
+            validators.MinValueValidator(7, ERROR_INVALID_AGE.format(age=7)),
         ),
+        blank=True,
+        null=True,
     )
     register_date = models.DateTimeField(
         'Дата регистрации',
@@ -85,3 +103,7 @@ class PostImage(models.Model):
         'Изображение',
         upload_to='posts',
     )
+
+    class Meta:
+        verbose_name = 'Изображение поста'
+        verbose_name_plural = 'Изображения поста'
