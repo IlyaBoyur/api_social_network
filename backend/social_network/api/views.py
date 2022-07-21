@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
@@ -11,7 +12,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .filters import PostFilter
 from .models import Post, User
 from .permissions import IsAuthorOrAuthenticatedOnly
-from .serializers import PostSerializer, UserSerializer
+
+User = get_user_model()
 
 
 @api_view(['GET'])
