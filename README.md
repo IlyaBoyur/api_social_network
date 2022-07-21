@@ -27,22 +27,40 @@ Django 4, Django REST Framework 3.13, Docker, PostgreSQL
 
 
 ### Локальный запуск приложения
-#### Чтобы поднять контейнеры
+Скачайте проект и перейдите в папку проекта.
+
+#### Подготовьте переменные окружения для проекта:
+```bash
+cd infra
+echo "SECRET_KEY=mysecretkey
+DJANGO_DEBUG_VALUE=True
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
+
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres" > .env
+```
+
+#### Поднимите контейнеры и мигрируйте базу данных:
 ```bash
 docker stop $(docker ps -aq)
-docker-compose -f infra/docker-compose.yml -up --build
-docker-compose exec -f infra/docker-compose.yml backend manage.py migrate
+docker-compose up --build -d
+docker-compose exec backend python3 manage.py migrate
 ```
 
-#### Чтобы добавить в базу тестовые данные
+#### Добавьте в базу тестовые данные
 ```bash
-docker compose cp data/dump.json backend:/
-docker-compose exec -f infra/docker-compose.yml backend manage.py loaddata /dump.json
+docker compose cp ../data/dump.json backend:/
+docker-compose exec backend python3 manage.py loaddata /dump.json
 ```
 
-#### Чтобы зайти внутрь контейнера бекенда
+#### Профит! Чтобы зайти внутрь контейнера бекенда:
 ```bash
-docker-compose exec backend sh
+docker-compose exec backend bash
 ```
 
 Сервис доступен по ссылке: [http://localhost:80/api/](http://localhost:8000/admin/)
@@ -50,6 +68,8 @@ docker-compose exec backend sh
 Документация: [http://localhost:80/api/docs/](http://localhost:8000/admin/)
 
 Админка: [http://localhost:80/admin/](http://localhost:8000/admin/)
+
+(Логин: admin; пароль: admin)
 
 ----
 
